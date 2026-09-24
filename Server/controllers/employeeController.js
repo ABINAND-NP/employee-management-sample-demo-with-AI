@@ -7,6 +7,8 @@ const addEmployee = async (req, res) => {
             name,
             email,
             phone,
+            age,
+            salary,
             department,
             designation,
             joiningDate
@@ -16,6 +18,8 @@ const addEmployee = async (req, res) => {
             !name ||
             !email ||
             !phone ||
+            !age ||
+            !salary ||
             !department ||
             !designation ||
             !joiningDate
@@ -37,6 +41,8 @@ const addEmployee = async (req, res) => {
             name,
             email,
             phone,
+            age,
+            salary,
             department,
             designation,
             joiningDate
@@ -102,9 +108,170 @@ const deleteEmployee = async (req, res) => {
     }
 };
 
+//aggregates 
+
+const getITEmloyees = async (req,res) => {
+    try {
+        const employees = await Employee.aggregate([
+       {
+         $match : {
+            department : "Finance",
+            // salary : {
+            //     $gt : 20000
+            // }
+        }
+       }
+    ]);
+
+    res.status(200).json({
+        employees
+    })
+        
+    } catch (error) {
+        console.log("getEmployees error", error);
+
+        res.json({
+            message : "server error",
+            error : error.message
+        })        
+        
+    }
+
+}
+
+const getDepartmentEmployeeList = async (req,res) => {
+    try {
+
+        // const result = await Employee.aggregate([
+        //     {
+        //         $group : {
+        //             _id : "$department",
+        //             totalEmployee : {
+        //                 $sum : 1
+        //             }
+        //         }
+        //     }
+        // ]);
+
+        const result = await  Employee.aggregate([
+            {
+                $group : {
+                    _id : "$department",
+                    totalSalary : {
+                        $sum : "$salary"
+                    }
+                }
+            }
+        ])
+
+        res.json({
+            result
+        })
+        
+    } catch (error) {
+        console.log(error);
+        res.json({
+            message : "server error",
+            error : error.message
+
+        })
+        
+        
+    }
+}
+
+const getDepartmentAverageSalary = async (req, res) => {
+    try {
+        const result = await Employee.aggregate([
+            {
+                $group: {
+                    _id: "$department",
+                    averageSalary: {
+                        $avg: "$salary"
+                    }
+                }
+            }
+        ]);
+
+        res.status(200).json({
+            result
+        });
+
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            message: "Server error",
+            error: error.message
+        });
+    }
+};
+
+const sortEmployeesBySalary = async (req, res) => {
+    try {
+
+        const result = await Employee.aggregate([
+            {
+                $sort: {
+                    salary: 1
+                    // salary: -1
+                }
+            }
+        ]);
+
+        res.status(200).json({
+            result
+        });
+
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            message: "Server error",
+            error: error.message
+        });
+    }
+};
+
+const getEmployeeBasicDetails = async (req, res) => {
+    try {
+
+        const result = await Employee.aggregate([
+            {
+                $project: {
+                    name: 1,
+                    email: 1,
+                    salary: 1,
+                    annualSalary: {
+                        $multiply: ["$salary", 12]
+                    },
+                    department: 1
+                }
+            }
+        ]);
+
+        res.status(200).json({
+            result
+        });
+
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            message: "Server error",
+            error: error.message
+        });
+    }
+};
 
 export {
     addEmployee,
     getEmployees,
-    deleteEmployee
+    deleteEmployee,
+    getITEmloyees,
+    getDepartmentEmployeeList,
+    getDepartmentAverageSalary,
+    sortEmployeesBySalary,
+    getEmployeeBasicDetails
+    
 };

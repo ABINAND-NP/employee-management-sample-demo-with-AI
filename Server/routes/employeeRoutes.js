@@ -3,7 +3,12 @@ import express from "express";
 import {
     addEmployee,
     getEmployees,
-    deleteEmployee
+    deleteEmployee,
+    getITEmloyees,
+    getDepartmentEmployeeList,
+    getDepartmentAverageSalary,
+    sortEmployeesBySalary,
+    getEmployeeBasicDetails
 } from "../controllers/employeeController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -35,5 +40,11 @@ router.delete(
     roleMiddleware("Admin"),
     deleteEmployee
 );
+
+router.get("/it",getITEmloyees);
+router.get("/group",getDepartmentEmployeeList);
+router.get("/avg",getDepartmentAverageSalary);
+router.get("/sort",sortEmployeesBySalary);
+router.get("/project",getEmployeeBasicDetails);
 
 export default router;

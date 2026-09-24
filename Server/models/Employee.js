@@ -4,7 +4,7 @@ const employeeSchema = new mongoose.Schema(
     {
         name: {
             type: String,
-            required: true, 
+            required: true,
             trim: true
         },
 
@@ -18,6 +18,16 @@ const employeeSchema = new mongoose.Schema(
 
         phone: {
             type: String,
+            required: true
+        },
+
+        age: {
+            type: Number,
+            required: true
+        },
+
+        salary: {
+            type: Number,
             required: true
         },
 
